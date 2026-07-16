@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Batch - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/trader/dashboard}">Dashboard</a>
+        <a th:href="@{/trader/batch/search}">Search Batch</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Search Batch</h2>
+
+    <!-- Search Form -->
+    <div class="card">
+        <div class="card-header">Enter Reference Code</div>
+        <form th:action="@{/trader/batch/search}" method="get"
+              style="display: flex; gap: 10px; padding: 5px 0;">
+            <input type="text" name="referenceCode"
+                   placeholder="e.g. SCZ-2026-00001"
+                   style="flex: 1;">
+            <button type="submit" class="btn btn-dark">Search</button>
+        </form>
+    </div>
+
+    <!-- Error -->
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- Batch Result -->
+    <div th:if="${batch != null}">
+
+        <div class="card">
+            <div class="card-header">
+                Batch: <span th:text="${batch.referenceCode}"></span>
+            </div>
+            <table>
+                <tr>
+                    <th style="width: 200px;">Reference Code</th>
+                    <td th:text="${batch.referenceCode}"></td>
+                </tr>
+                <tr>
+                    <th>Farm</th>
+                    <td th:text="${batch.farm.farmName}"></td>
+                </tr>
+                <tr>
+                    <th>District</th>
+                    <td th:text="${batch.farm.district}"></td>
+                </tr>
+                <tr>
+                    <th>Region</th>
+                    <td th:text="${batch.farm.region}"></td>
+                </tr>
+                <tr>
+                    <th>Spice Type</th>
+                    <td th:text="${batch.spiceType}"></td>
+                </tr>
+                <tr>
+                    <th>Quantity (kg)</th>
+                    <td th:text="${batch.quantityKg}"></td>
+                </tr>
+                <tr>
+                    <th>Harvest Date</th>
+                    <td th:text="${batch.harvestDate}"></td>
+                </tr>
+                <tr>
+                    <th>Current Status</th>
+                    <td>
+                        <span th:class="'badge badge-' +
+                              ${batch.currentStatus.toLowerCase()}"
+                              th:text="${batch.currentStatus}"></span>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="padding: 15px 0;">
+                <a th:href="@{/trader/batch/{id}/update(id=${batch.id})}"
+                   class="btn btn-dark">Update Status</a>
+                &nbsp;
+                <a th:href="@{/trader/batch/{id}(id=${batch.id})}"
+                   class="btn btn-dark">View Full Detail</a>
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="card">
+            <div class="card-header">Batch History</div>
+            <ul class="timeline" th:if="${!events.isEmpty()}">
+                <li th:each="event : ${events}">
+                    <div class="event-date"
+                         th:text="${event.eventDate}"></div>
+                    <div class="event-type"
+                         th:text="${event.eventType}"></div>
+                    <div style="font-size: 13px; color: #555;">
+                        By: <span th:text="${event.actor.fullName}"></span>
+                    </div>
+                    <div th:if="${event.notes != null}"
+                         style="font-size: 13px; margin-top: 4px;"
+                         th:text="${event.notes}"></div>
+                </li>
+            </ul>
+            <p th:if="${events.isEmpty()}" style="color: #666;">
+                No events recorded yet.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Batch Detail - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/farmer/dashboard}">Dashboard</a>
+        <a th:href="@{/farmer/farm/register}">Register Farm</a>
+        <a th:href="@{/farmer/batch/create}">Create Batch</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Batch Detail</h2>
+
+    <!-- Batch Info -->
+    <div class="card">
+        <div class="card-header">
+            Batch: <span th:text="${batch.referenceCode}"></span>
+        </div>
+
+        <table>
+            <tr>
+                <th style="width: 200px;">Reference Code</th>
+                <td th:text="${batch.referenceCode}"></td>
+            </tr>
+            <tr>
+                <th>Farm</th>
+                <td th:text="${batch.farm.farmName}"></td>
+            </tr>
+            <tr>
+                <th>District</th>
+                <td th:text="${batch.farm.district}"></td>
+            </tr>
+            <tr>
+                <th>Region</th>
+                <td th:text="${batch.farm.region}"></td>
+            </tr>
+            <tr>
+                <th>Spice Type</th>
+                <td th:text="${batch.spiceType}"></td>
+            </tr>
+            <tr>
+                <th>Quantity (kg)</th>
+                <td th:text="${batch.quantityKg}"></td>
+            </tr>
+            <tr>
+                <th>Harvest Date</th>
+                <td th:text="${batch.harvestDate}"></td>
+            </tr>
+            <tr>
+                <th>Current Status</th>
+                <td>
+                    <span th:class="'badge badge-' + ${batch.currentStatus.toLowerCase()}"
+                          th:text="${batch.currentStatus}"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- QR Code -->
+    <div class="card">
+        <div class="card-header">QR Code</div>
+        <div style="padding: 10px;">
+            <div th:if="${batch.qrCodePath != null}">
+                <p style="margin-bottom: 10px; font-size: 14px;">
+                    Scan this QR code to verify batch origin and history.
+                </p>
+                <img th:src="@{'/'+${batch.qrCodePath}}"
+                     class="qr-image" alt="QR Code">
+                <br>
+                <a th:href="@{'/'+${batch.qrCodePath}}"
+                   download class="btn btn-dark btn-sm"
+                   style="margin-top: 10px;">
+                    Download QR Code
+                </a>
+                </a>
+            </div>
+            <div th:if="${batch.qrCodePath == null}">
+                <p style="color: #666;">QR code not yet generated.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Events Timeline -->
+    <div class="card">
+        <div class="card-header">Batch History</div>
+        <div style="padding: 10px;">
+            <ul class="timeline" th:if="${!events.isEmpty()}">
+                <li th:each="event : ${events}">
+                    <div class="event-date"
+                         th:text="${event.eventDate}"></div>
+                    <div class="event-type"
+                         th:text="${event.eventType}"></div>
+                    <div th:if="${event.actor != null}"
+                         style="font-size: 13px; color: #555;">
+                        By: <span th:text="${event.actor.fullName}"></span>
+                    </div>
+                    <div th:if="${event.notes != null}"
+                         style="font-size: 13px; margin-top: 4px;"
+                         th:text="${event.notes}"></div>
+                </li>
+            </ul>
+            <p th:if="${events.isEmpty()}" style="color: #666;">
+                No events recorded yet.
+            </p>
+        </div>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <a th:href="@{/farmer/dashboard}" class="btn btn-dark">
+            Back to Dashboard
+        </a>
+        &nbsp;
+        <a th:href="@{/verify/{ref}(ref=${batch.referenceCode})}"
+           class="btn btn-dark">
+            Public Verify Page
+        </a>
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Batch - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/farmer/dashboard}">Dashboard</a>
+        <a th:href="@{/farmer/farm/register}">Register Farm</a>
+        <a th:href="@{/farmer/batch/create}">Create Batch</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Create New Batch</h2>
+
+    <div th:if="${farms.isEmpty()}" class="alert alert-warning">
+        You have no farms registered yet.
+        <a th:href="@{/farmer/farm/register}">Register a farm first</a>
+    </div>
+
+    <div class="card" th:if="${!farms.isEmpty()}">
+        <div class="card-header">Batch Details</div>
+
+        <div id="error-msg" class="alert alert-danger"
+             style="display:none;"></div>
+
+        <form th:action="@{/farmer/batch/create}"
+              method="post" id="batchForm">
+
+            <div class="form-group">
+                <label>Select Farm</label>
+                <select name="farmId" id="farmSelect" required
+                        onchange="loadSpices(this.value)">
+                    <option value="">-- Select Farm --</option>
+                    <option th:each="farm : ${farms}"
+                            th:value="${farm.id}"
+                            th:text="${farm.farmName + ' - ' + farm.district}"
+                            th:attr="data-spices=${farm.spiceTypes}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Spice Type</label>
+                <select name="spiceType" id="spiceSelect" required>
+                    <option value="">-- Select Farm First --</option>
+                </select>
+                <small id="spice-hint"
+                       style="color:#666; font-size:12px; display:none;">
+                    Only spices registered for this farm are shown.
+                </small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Quantity (kg)</label>
+                    <input type="number" name="quantityKg"
+                           id="quantityKg"
+                           placeholder="e.g. 50"
+                           step="0.1" min="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Harvest Date</label>
+                    <input type="date" name="harvestDate"
+                           id="harvestDate" required>
+                </div>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <button type="submit" class="btn btn-dark"
+                        onclick="return validateForm()">
+                    Create Batch
+                </button>
+                &nbsp;
+                <a th:href="@{/farmer/dashboard}"
+                   class="btn btn-dark">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Farm spices data (hidden) -->
+    <div id="farm-data" style="display:none;">
+        <span th:each="farm : ${farms}"
+              th:id="'farm-' + ${farm.id}"
+              th:data-spices="${farm.spiceTypes}">
+        </span>
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+<script>
+    function loadSpices(farmId) {
+        var spiceSelect = document.getElementById('spiceSelect');
+        var spiceHint = document.getElementById('spice-hint');
+        var errorMsg = document.getElementById('error-msg');
+
+        // Clear current options
+        spiceSelect.innerHTML = '<option value="">-- Select Spice --</option>';
+        errorMsg.style.display = 'none';
+
+        if (!farmId) {
+            spiceSelect.innerHTML = '<option value="">-- Select Farm First --</option>';
+            spiceHint.style.display = 'none';
+            return;
+        }
+
+        // Get spices from hidden farm data
+        var farmSpan = document.getElementById('farm-' + farmId);
+        if (farmSpan) {
+            var spices = farmSpan.getAttribute('data-spices');
+            if (spices && spices.trim() !== '') {
+                // Split by comma in case multiple spices
+                var spiceList = spices.split(',');
+                spiceList.forEach(function(spice) {
+                    var trimmed = spice.trim();
+                    if (trimmed) {
+                        var option = document.createElement('option');
+                        option.value = trimmed;
+                        option.text = trimmed;
+                        spiceSelect.appendChild(option);
+                    }
+                });
+                spiceHint.style.display = 'block';
+            } else {
+                spiceSelect.innerHTML =
+                    '<option value="">No spices registered for this farm</option>';
+            }
+        }
+    }
+
+    function validateForm() {
+        var farmId = document.getElementById('farmSelect').value;
+        var spiceType = document.getElementById('spiceSelect').value;
+        var quantity = document.getElementById('quantityKg').value;
+        var harvestDate = document.getElementById('harvestDate').value;
+        var errorMsg = document.getElementById('error-msg');
+
+        if (!farmId) {
+            errorMsg.textContent = 'Please select a farm.';
+            errorMsg.style.display = 'block';
+            return false;
+        }
+
+        if (!spiceType) {
+            errorMsg.textContent = 'Please select a spice type.';
+            errorMsg.style.display = 'block';
+            return false;
+        }
+
+        // Validate spice belongs to farm
+        var farmSpan = document.getElementById('farm-' + farmId);
+        if (farmSpan) {
+            var registeredSpices = farmSpan.getAttribute('data-spices');
+            var spiceList = registeredSpices.split(',').map(
+                function(s) { return s.trim(); }
+            );
+            if (!spiceList.includes(spiceType)) {
+                errorMsg.textContent =
+                    'This spice is not registered for the selected farm. ' +
+                    'Please select a spice that belongs to this farm.';
+                errorMsg.style.display = 'block';
+                return false;
+            }
+        }
+
+        if (!quantity || quantity <= 0) {
+            errorMsg.textContent = 'Please enter a valid quantity.';
+            errorMsg.style.display = 'block';
+            return false;
+        }
+
+        if (!harvestDate) {
+            errorMsg.textContent = 'Please select a harvest date.';
+            errorMsg.style.display = 'block';
+            return false;
+        }
+
+        // Check harvest date not in future
+        var today = new Date().toISOString().split('T')[0];
+        if (harvestDate > today) {
+            errorMsg.textContent =
+                'Harvest date cannot be in the future.';
+            errorMsg.style.display = 'block';
+            return false;
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trader Dashboard - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/trader/dashboard}">Dashboard</a>
+        <a th:href="@{/trader/batch/search}">Search Batch</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div th:if="${param.updated}" class="alert alert-success">
+        Batch status updated successfully.
+    </div>
+
+    <h2 style="margin-bottom: 20px;">
+        Welcome, <span th:text="${trader.fullName}"></span>
+    </h2>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-box">
+            <h2 th:text="${batches.size()}">0</h2>
+            <p>Total Batches</p>
+        </div>
+    </div>
+
+    <!-- Search bar -->
+    <div class="card">
+        <div class="card-header">Search Batch by Reference Code</div>
+        <form th:action="@{/trader/batch/search}" method="get"
+              style="display: flex; gap: 10px; padding: 5px 0;">
+            <input type="text" name="referenceCode"
+                   placeholder="e.g. SCZ-2026-00001"
+                   style="flex: 1;">
+            <button type="submit" class="btn btn-dark">Search</button>
+        </form>
+    </div>
+
+    <!-- All Batches -->
+    <div class="card">
+        <div class="card-header">All Batches</div>
+        <div th:if="${batches.isEmpty()}" style="padding: 15px; color: #666;">
+            No batches available.
+        </div>
+        <table th:if="${!batches.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Reference Code</th>
+                <th>Farm</th>
+                <th>Spice Type</th>
+                <th>Quantity (kg)</th>
+                <th>Harvest Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="batch : ${batches}">
+                <td th:text="${batch.referenceCode}"></td>
+                <td th:text="${batch.farm.farmName}"></td>
+                <td th:text="${batch.spiceType}"></td>
+                <td th:text="${batch.quantityKg}"></td>
+                <td th:text="${batch.harvestDate}"></td>
+                <td>
+                        <span th:class="'badge badge-' +
+                              ${batch.currentStatus.toLowerCase()}"
+                              th:text="${batch.currentStatus}"></span>
+                </td>
+                <td>
+                    <a th:href="@{/trader/batch/{id}(id=${batch.id})}"
+                       class="btn btn-dark btn-sm">View</a>
+                    &nbsp;
+                    <a th:href="@{/trader/batch/{id}/update(id=${batch.id})}"
+                       class="btn btn-dark btn-sm">Update</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

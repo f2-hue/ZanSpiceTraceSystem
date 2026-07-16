@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/admin/batches}">Batches</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+        <a th:href="@{/admin/messages}">Messages</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div th:if="${param.approved}" class="alert alert-success">
+        User approved successfully.
+    </div>
+    <div th:if="${param.suspended}" class="alert alert-warning">
+        User suspended successfully.
+    </div>
+    <div th:if="${param.deleted}" class="alert alert-danger">
+        User deleted successfully.
+    </div>
+
+    <h2 style="margin-bottom: 20px;">Admin Dashboard</h2>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-box">
+            <h2 th:text="${totalBatches}">0</h2>
+            <p>Total Batches</p>
+        </div>
+        <div class="stat-box">
+            <h2 th:text="${activeCount}">0</h2>
+            <p>Active Users</p>
+        </div>
+        <div class="stat-box">
+            <h2 th:text="${pendingCount}">0</h2>
+            <p>Pending Approval</p>
+        </div>
+    </div>
+
+    <!-- Pending Users -->
+    <div class="card">
+        <div class="card-header">Pending User Approvals</div>
+        <div th:if="${#lists.isEmpty(users)}"
+             style="padding: 15px; color: #666;">
+            No users found.
+        </div>
+        <table th:if="${!#lists.isEmpty(users)}">
+            <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}"
+                th:if="${user.status == 'PENDING'}">
+                <td th:text="${user.fullName}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.role}"></td>
+                <td>
+                        <span class="badge badge-pending"
+                              th:text="${user.status}"></span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/users/{id}/approve(id=${user.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-success btn-sm">
+                            Approve
+                        </button>
+                    </form>
+                    &nbsp;
+                    <form th:action="@{/admin/users/{id}/delete(id=${user.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirmAction('Delete this user?')">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Batches -->
+    <div class="card">
+        <div class="card-header">Recent Batches</div>
+        <div th:if="${#lists.isEmpty(batches)}"
+             style="padding: 15px; color: #666;">
+            No batches found.
+        </div>
+        <table th:if="${!#lists.isEmpty(batches)}">
+            <thead>
+            <tr>
+                <th>Reference Code</th>
+                <th>Farm</th>
+                <th>Spice Type</th>
+                <th>Quantity (kg)</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="batch : ${batches}">
+                <td th:text="${batch.referenceCode}"></td>
+                <td th:text="${batch.farm.farmName}"></td>
+                <td th:text="${batch.spiceType}"></td>
+                <td th:text="${batch.quantityKg}"></td>
+                <td>
+                        <span th:class="'badge badge-' +
+                              ${batch.currentStatus.toLowerCase()}"
+                              th:text="${batch.currentStatus}"></span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/batches/{id}/flag(id=${batch.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirmAction('Flag this batch?')">
+                            Flag
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="padding: 10px 0;">
+            <a th:href="@{/admin/batches}"
+               class="btn btn-dark btn-sm">View All Batches</a>
+        </div>
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
