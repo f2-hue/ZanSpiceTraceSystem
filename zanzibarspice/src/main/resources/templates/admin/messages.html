@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Messages - SpiceChain Zanzibar</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+  <span class="navbar-brand">SpiceChain Zanzibar</span>
+  <div>
+    <a th:href="@{/admin/dashboard}">Dashboard</a>
+    <a th:href="@{/admin/users}">Users</a>
+    <a th:href="@{/admin/batches}">Batches</a>
+    <a th:href="@{/admin/messages}">
+      Messages
+      <span th:if="${unreadCount > 0}"
+            th:text="'(' + ${unreadCount} + ')'">
+            </span>
+    </a>
+    <a th:href="@{/verify}">Verify Batch</a>
+    <a th:href="@{/logout}">Logout</a>
+  </div>
+</div>
+
+<div class="container">
+  <h2 style="margin-bottom: 20px;">Contact Messages</h2>
+
+  <div th:if="${param.deleted}" class="alert alert-danger">
+    Message deleted successfully.
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-box">
+      <h2 th:text="${messages.size()}">0</h2>
+      <p>Total Messages</p>
+    </div>
+    <div class="stat-box">
+      <h2 th:text="${unreadCount}">0</h2>
+      <p>Unread Messages</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">All Messages</div>
+
+    <div th:if="${#lists.isEmpty(messages)}"
+         style="padding: 15px; color: #666;">
+      No messages yet.
+    </div>
+
+    <table th:if="${!#lists.isEmpty(messages)}">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Message</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="msg, stat : ${messages}"
+          th:style="${!msg.isRead} ? 'background:#fffde7;' : ''">
+        <td th:text="${stat.count}"></td>
+        <td th:text="${msg.senderName}"></td>
+        <td th:text="${msg.senderEmail}"></td>
+        <td>
+                        <span th:text="${#strings.abbreviate(msg.message, 60)}">
+                        </span>
+          <br>
+          <small th:text="${msg.message}"
+                 style="color:#666; font-size:12px;
+                               display:block; margin-top:5px;">
+          </small>
+        </td>
+        <td th:text="${msg.sentAt}"></td>
+        <td>
+                        <span th:if="${!msg.isRead}"
+                              class="badge badge-pending">Unread</span>
+          <span th:if="${msg.isRead}"
+                class="badge badge-active">Read</span>
+        </td>
+        <td>
+          <form th:if="${!msg.isRead}"
+                th:action="@{/admin/messages/{id}/read(id=${msg.id})}"
+                method="post" style="display:inline;">
+            <button type="submit"
+                    class="btn btn-success btn-sm">
+              Mark Read
+            </button>
+          </form>
+          &nbsp;
+          <form th:action="@{/admin/messages/{id}/delete(id=${msg.id})}"
+                method="post" style="display:inline;">
+            <button type="submit"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirmAction('Delete this message?')">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

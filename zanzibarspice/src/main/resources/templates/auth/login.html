@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="card-header">
+            <h4>SpiceChain Zanzibar</h4>
+            <small>Spice Traceability System</small>
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            Invalid email or password.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-info">
+            You have been logged out.
+        </div>
+        <div th:if="${param.registered}" class="alert alert-success">
+            Registration successful. Wait for admin approval.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="username"
+                       placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password"
+                       placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-dark btn-full">Login</button>
+        </form>
+
+        <hr>
+        <p style="text-align:center;">
+            No account? <a th:href="@{/register}">Register here</a>
+        </p>
+        <p style="text-align:center; margin-top:8px;">
+            <a th:href="@{/verify}">Verify a Spice Batch</a>
+        </p>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

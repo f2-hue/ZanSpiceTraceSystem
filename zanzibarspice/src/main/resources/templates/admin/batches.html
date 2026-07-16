@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Batches - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/admin/batches}">Batches</a>
+        <a th:href="@{/admin/messages}">Messages</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">All Batches</h2>
+
+    <div th:if="${param.flagged}" class="alert alert-warning">
+        Batch flagged successfully.
+    </div>
+    <div th:if="${param.unflagged}" class="alert alert-success">
+        Batch unflagged successfully.
+    </div>
+
+    <div class="card">
+        <div class="card-header">Batch Management</div>
+
+        <div th:if="${#lists.isEmpty(batches)}"
+             style="padding: 15px; color: #666;">
+            No batches found.
+        </div>
+
+        <table th:if="${!#lists.isEmpty(batches)}">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Reference Code</th>
+                <th>Farm</th>
+                <th>Farmer</th>
+                <th>Spice Type</th>
+                <th>Quantity (kg)</th>
+                <th>Harvest Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="batch, stat : ${batches}">
+                <td th:text="${stat.count}"></td>
+                <td th:text="${batch.referenceCode}"></td>
+                <td th:text="${batch.farm.farmName}"></td>
+                <td th:text="${batch.farm.farmer.fullName}"></td>
+                <td th:text="${batch.spiceType}"></td>
+                <td th:text="${batch.quantityKg}"></td>
+                <td th:text="${batch.harvestDate}"></td>
+                <td>
+                        <span th:class="'badge badge-' +
+                              ${batch.currentStatus.toLowerCase()}"
+                              th:text="${batch.currentStatus}"></span>
+                </td>
+                <td>
+                    <!-- Verify -->
+                    <a th:href="@{/verify/{ref}(ref=${batch.referenceCode})}"
+                       class="btn btn-dark btn-sm">Verify</a>
+                    &nbsp;
+
+                    <!-- Flag -->
+                    <form th:if="${batch.currentStatus != 'FLAGGED'}"
+                          th:action="@{/admin/batches/{id}/flag(id=${batch.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirmAction('Flag this batch?')">
+                            Flag
+                        </button>
+                    </form>
+
+                    <!-- Unflag -->
+                    <form th:if="${batch.currentStatus == 'FLAGGED'}"
+                          th:action="@{/admin/batches/{id}/unflag(id=${batch.id})}"
+                          method="post" style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-success btn-sm"
+                                onclick="return confirmAction('Unflag this batch?')">
+                            Unflag
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

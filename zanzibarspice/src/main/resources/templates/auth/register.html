@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="card-header">
+            <h4>Create Account</h4>
+            <small>SpiceChain Zanzibar</small>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="fullName"
+                       placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email"
+                       placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password"
+                       placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="">-- Select Role --</option>
+                    <option th:each="role : ${roles}"
+                            th:value="${role}"
+                            th:text="${role}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-dark btn-full">
+                Register
+            </button>
+        </form>
+
+        <hr>
+        <p style="text-align:center;">
+            Already have account? <a th:href="@{/login}">Login here</a>
+        </p>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <sec:authorize access="hasRole('FARMER')">
+            <a th:href="@{/farmer/dashboard}">My Dashboard</a>
+        </sec:authorize>
+        <sec:authorize access="hasRole('TRADER')">
+            <a th:href="@{/trader/dashboard}">My Dashboard</a>
+        </sec:authorize>
+        <sec:authorize access="hasRole('ADMIN')">
+            <a th:href="@{/admin/dashboard}">Admin Panel</a>
+        </sec:authorize>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card" style="text-align:center; padding: 50px;">
+        <h2>Welcome to SpiceChain Zanzibar</h2>
+        <p style="margin: 15px 0; color: #666;">
+            Redirecting you to your dashboard...
+        </p>
+
+        <sec:authorize access="hasRole('FARMER')">
+            <a th:href="@{/farmer/dashboard}" class="btn btn-dark">
+                Go to Farmer Dashboard
+            </a>
+        </sec:authorize>
+
+        <sec:authorize access="hasRole('TRADER')">
+            <a th:href="@{/trader/dashboard}" class="btn btn-dark">
+                Go to Trader Dashboard
+            </a>
+        </sec:authorize>
+
+        <sec:authorize access="hasRole('ADMIN')">
+            <a th:href="@{/admin/dashboard}" class="btn btn-dark">
+                Go to Admin Panel
+            </a>
+        </sec:authorize>
+    </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+<script>
+    // Auto redirect based on role
+    window.onload = function() {
+        var adminLink = document.querySelector('a[href*="/admin/dashboard"]');
+        var farmerLink = document.querySelector('a[href*="/farmer/dashboard"]');
+        var traderLink = document.querySelector('a[href*="/trader/dashboard"]');
+
+        if (adminLink) {
+            setTimeout(function() { window.location.href = adminLink.href; }, 1000);
+        } else if (farmerLink) {
+            setTimeout(function() { window.location.href = farmerLink.href; }, 1000);
+        } else if (traderLink) {
+            setTimeout(function() { window.location.href = traderLink.href; }, 1000);
+        }
+    };
+</script>
+</body>
+</html>

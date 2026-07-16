@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Farm - SpiceChain Zanzibar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">SpiceChain Zanzibar</span>
+    <div>
+        <a th:href="@{/farmer/dashboard}">Dashboard</a>
+        <a th:href="@{/farmer/farm/register}">Register Farm</a>
+        <a th:href="@{/farmer/batch/create}">Create Batch</a>
+        <a th:href="@{/verify}">Verify Batch</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Register New Farm</h2>
+
+    <div class="card">
+        <div class="card-header">Farm Details</div>
+
+        <form th:action="@{/farmer/farm/register}" method="post"
+              id="farmForm">
+
+            <div class="form-group">
+                <label>Farm Name</label>
+                <input type="text" name="farmName"
+                       placeholder="Enter farm name" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>District</label>
+                    <select name="district" required>
+                        <option value="">-- Select District --</option>
+                        <option th:each="d : ${districts}"
+                                th:value="${d}"
+                                th:text="${d}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Region</label>
+                    <select name="region" required>
+                        <option value="">-- Select Region --</option>
+                        <option th:each="r : ${regions}"
+                                th:value="${r}"
+                                th:text="${r}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Land Size (acres)</label>
+                <input type="number" name="landSizeAcres"
+                       placeholder="e.g. 2.5" step="0.1"
+                       min="0.1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Spice Types Grown
+                    <small style="color:#666; font-size:11px;">
+                        (Select one or more)
+                    </small>
+                </label>
+                <div style="border:1px solid #ccc; padding:12px;">
+                    <label style="display:block; margin-bottom:8px;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Cloves"> Cloves
+                    </label>
+                    <label style="display:block; margin-bottom:8px;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Cinnamon"> Cinnamon
+                    </label>
+                    <label style="display:block; margin-bottom:8px;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Black Pepper"> Black Pepper
+                    </label>
+                    <label style="display:block; margin-bottom:8px;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Cardamom"> Cardamom
+                    </label>
+                    <label style="display:block; margin-bottom:8px;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Nutmeg"> Nutmeg
+                    </label>
+                    <label style="display:block;
+                                  font-weight:normal;">
+                        <input type="checkbox"
+                               name="spiceTypesCheck"
+                               value="Turmeric"> Turmeric
+                    </label>
+                </div>
+                <input type="hidden" name="spiceTypes"
+                       id="spiceTypesHidden">
+            </div>
+
+            <div style="margin-top: 15px;">
+                <button type="submit" class="btn btn-dark">
+                    Register Farm
+                </button>
+                &nbsp;
+                <a th:href="@{/farmer/dashboard}"
+                   class="btn btn-dark">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+<script>
+    document.getElementById('farmForm')
+        .addEventListener('submit', function(e) {
+            var checked = document.querySelectorAll(
+                'input[name="spiceTypesCheck"]:checked'
+            );
+            if (checked.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one spice type.');
+                return;
+            }
+            var spices = Array.from(checked).map(function(cb) {
+                return cb.value;
+            }).join(',');
+            document.getElementById('spiceTypesHidden').value = spices;
+        });
+</script>
+</body>
+</html>
